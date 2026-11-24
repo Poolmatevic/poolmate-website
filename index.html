@@ -13,6 +13,7 @@ body{margin:0;background:#F2F8FC}
 a{color:#0043A6}a:hover{color:#002F75}
 </style>
 <style>html{scroll-behavior:smooth}img{max-width:100%}</style>
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
 </head>
 <body>
 <div style="font-family: Inter, system-ui, sans-serif; color: #0B2240; background: #F2F8FC; line-height: 1.55">
@@ -368,6 +369,14 @@ Call 0490 842 557</a>
 
 </div>
 </div>
+<div style="margin-top: 20px; background: #FFFFFF; border-radius: 16px; padding: 12px">
+<div id="service-map" role="region" aria-label="Map of Poolmate's service area around Malvern" style="height: 440px; border-radius: 10px; overflow: hidden; background: #DDE9F3"></div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px 24px; padding: 12px 8px 4px; font-size: 14px; color: #3B5170">
+<span style="display: inline-flex; align-items: center; gap: 8px"><span aria-hidden="true" style="width: 14px; height: 14px; border-radius: 50%; background: #FFC845; border: 2px solid #0B2240"></span>Malvern (home base)</span>
+<span style="display: inline-flex; align-items: center; gap: 8px"><span aria-hidden="true" style="width: 14px; height: 14px; border-radius: 50%; background: #0043A6"></span>Core service area</span>
+<span style="display: inline-flex; align-items: center; gap: 8px"><span aria-hidden="true" style="width: 14px; height: 14px; border-radius: 50%; background: #0098C8"></span>Extended service area</span>
+</div>
+</div>
 </div>
 </div>
 </section>
@@ -433,5 +442,46 @@ Call 0490 842 557</a>
 </footer>
 
 </div>
+<script src="vendor/leaflet/leaflet.js"></script>
+<script>
+(function () {
+  if (!window.L) return;
+  var core = [
+    ["Malvern",-37.8616,145.0287],["Malvern East",-37.874,145.06],["Toorak",-37.841,145.018],["Armadale",-37.856,145.019],
+    ["Glen Iris",-37.857,145.06],["Kooyong",-37.84,145.033],["Caulfield",-37.882,145.025],["Caulfield North",-37.871,145.025],
+    ["Caulfield South",-37.895,145.026],["South Yarra",-37.838,144.992],["Prahran",-37.851,144.993],["Glen Huntly",-37.889,145.042],
+    ["Carnegie",-37.887,145.057],["Murrumbeena",-37.89,145.07],["Ashburton",-37.862,145.08],["Camberwell",-37.84,145.07],
+    ["Hawthorn East",-37.828,145.05]
+  ];
+  var extended = [
+    ["Brighton",-37.906,144.998],["Brighton East",-37.904,145.022],["Hampton",-37.937,145.0],["Sandringham",-37.95,145.006],
+    ["Elwood",-37.882,144.984],["Elsternwick",-37.885,145.003],["St Kilda",-37.866,144.98],["Richmond",-37.82,145.0],
+    ["Hawthorn",-37.822,145.031],["Kew",-37.806,145.03],["Balwyn",-37.81,145.08],["Surrey Hills",-37.826,145.1],
+    ["Box Hill",-37.819,145.125],["Mount Waverley",-37.877,145.128],["Glen Waverley",-37.878,145.164],["Chadstone",-37.887,145.095],
+    ["Oakleigh",-37.9,145.088],["Bentleigh",-37.918,145.035]
+  ];
+  var touch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+  var map = L.map('service-map', { scrollWheelZoom: false, dragging: !touch, tap: false, zoomControl: true });
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 16, minZoom: 10,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+  var pts = [];
+  extended.forEach(function (s) {
+    pts.push([s[1], s[2]]);
+    L.circleMarker([s[1], s[2]], { radius: 7, color: '#FFFFFF', weight: 2, fillColor: '#0098C8', fillOpacity: 0.95 })
+      .bindTooltip(s[0]).addTo(map);
+  });
+  core.forEach(function (s) {
+    pts.push([s[1], s[2]]);
+    if (s[0] === 'Malvern') return;
+    L.circleMarker([s[1], s[2]], { radius: 8, color: '#FFFFFF', weight: 2, fillColor: '#0043A6', fillOpacity: 0.95 })
+      .bindTooltip(s[0]).addTo(map);
+  });
+  L.circleMarker([-37.8616, 145.0287], { radius: 11, color: '#0B2240', weight: 3, fillColor: '#FFC845', fillOpacity: 1 })
+    .bindTooltip('Malvern (home base)', { permanent: true, direction: 'top', offset: [0, -10] }).addTo(map);
+  map.fitBounds(pts, { padding: [24, 24] });
+})();
+</script>
 </body>
 </html>
